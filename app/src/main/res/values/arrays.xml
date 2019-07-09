@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="goods_type">
+        <item>数码</item>
+        <item>电器</item>
+        <item>日常用品</item>
+        <item>书籍</item>
+        <item>服饰</item>
+        <item>其他</item>
+    </string-array>
+</resources>

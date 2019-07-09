@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ffffff</color>
+    <color name="colorPrimaryDark">#ffffff</color>
+    <color name="colorAccent">#000000</color>
+    <color name="border_color">#0b0101</color>
+    <drawable name="button_blue">#FFF4F0F0</drawable>
+    <drawable name="button_white">#ffff</drawable>
+    <drawable name="text_blue">#04bdf0</drawable>
+    <drawable name="text_white">#ffff</drawable>
+    <color name="default_ripple">#c2c2c2</color>
+</resources>

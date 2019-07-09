@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "27.0.0"
+    defaultConfig {
+        applicationId "com.ghl.bottomview"
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    //1.0.5 当1.1.0出现问题可以回退到1.0.5.1
+    //没有使用特殊Header，可以不加这行
+//    compile 'com.android.support:appcompat-v7:25.3.1'//版本 23以上（必须）
+//    compile 'com.android.support:design:25.3.1'//版本随意（非必须，引用可以解决无法预览问题）
+    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:support-vector-drawable:26.+'
+    compile 'com.android.support:support-v4:26.+'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-6'
+    testCompile 'junit:junit:4.12'
+}

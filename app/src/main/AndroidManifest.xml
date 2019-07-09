@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ljh.fleamarket.activity">
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.hardware.camera.autofocus" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/icon_fleamarket"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/icon_fleamarket"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.ljh.activity.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/update_files" />
+        </provider>
+
+        <activity
+            android:name=".index.LogoActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".index.MainActivity" />
+        <activity android:name=".me.LoginActivity" />
+        <activity android:name=".me.RegisterActivity" />
+        <activity android:name=".find.AddSaleActivity" />
+        <activity android:name=".find.AddBuyActivity" />
+        <activity android:name=".index.SearchActivity" />
+        <activity android:name=".sort.SortDigitalActivity" />
+        <activity android:name=".sort.SortApplianceActivity" />
+        <activity android:name=".sort.SortEverydayitemsActivity" />
+        <activity android:name=".sort.SortBooksActivity" />
+        <activity android:name=".sort.SortClothesActivity" />
+        <activity android:name=".sort.SortOtherActivity" />
+        <activity android:name=".me.ResetpasswordActivity" />
+        <activity android:name=".me.MySaleActivity" />
+        <activity android:name=".me.UserInfoActivty" />
+        <activity android:name=".me.UpDateUserInfoActivity" />
+        <activity android:name=".me.MyBuyActivity" />
+        <activity android:name=".me.CollectionActivity" />
+        <activity android:name=".me.AboutUsActivity" />
+        <activity android:name=".me.SettingActivity" />
+        <activity android:name=".find.GoodsInfoActivity"></activity>
+    </application>
+
+</manifest>

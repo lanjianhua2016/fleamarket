@@ -1,0 +1,32 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="#FFF4F0F0"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <!--<com.ghl.bottomview.PullToRefreshAndPushToLoadView-->
+    <!--android:id="@+id/prpt_goods"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" >-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/smartrefresh_layout_sale"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycleview_salegoods"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffffff"></android.support.v7.widget.RecyclerView>
+        </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+
+
+
+
+    <!--</com.ghl.bottomview.PullToRefreshAndPushToLoadView>-->
+</LinearLayout>
