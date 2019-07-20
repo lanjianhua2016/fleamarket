@@ -460,20 +460,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Log.i(TAG, "准备显示图片");
                     imageView.setImageBitmap(image);
 
-//                    //image为拍照后生成的bitmap对象下面开始将其转为byte数组
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                    image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                    byte [] userImage = baos.toByteArray();
-//
-//                    Log.i("register","即将存储在sp中的字节数组为："+userImage);
-//                    //将图片字节数组转为字符串并保存在sp中
-//                    String userHeaderImage = new String(Base64.encode(userImage,Base64.DEFAULT));
-//                    Log.i("register","即将存储在sp中的由字节数组转换而来的字符串为："+userHeaderImage);
-//
-//                    sharedPreferences=getSharedPreferences("userHeader",MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putString("userHeader",userHeaderImage);
-//                    editor.apply();
+                    //image为拍照后生成的bitmap对象下面开始将其转为byte数组
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] userImage = baos.toByteArray();
+
+                    Log.i("register", "即将存储在sp中的字节数组为：" + userImage);
+                    //将图片字节数组转为字符串并保存在sp中
+                    String userHeaderImage = new String(Base64.encode(userImage, Base64.DEFAULT));
+                    Log.i("register", "即将存储在sp中的由字节数组转换而来的字符串为：" + userHeaderImage);
+
+                    sharedPreferences = getSharedPreferences("userHeader", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("userHeader", userHeaderImage);
+                    editor.apply();
 
                 }
                 break;
