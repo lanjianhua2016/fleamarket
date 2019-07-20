@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.ljh.fleamarket.activity.find.GoodsInfoActivity">
+
     <FrameLayout
+        android:id="@+id/head_bar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="#ffffff">
@@ -17,22 +19,72 @@
             android:layout_height="30dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:background="@drawable/icon_arrow_back"/>
+            android:background="@drawable/icon_arrow_back" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="商品信息"
+            android:text="商品详情"
             android:textColor="#000000"
-            android:textSize="20dp"/>
+            android:textSize="20dp" />
     </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/goodsinfo_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        android:layout_above="@+id/goods_control"
+        android:layout_below="@+id/head_bar"></android.support.v7.widget.RecyclerView>
 
+    <LinearLayout
+        android:id="@+id/goods_control"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
-</LinearLayout>
+        <LinearLayout
+            android:id="@+id/l_layout_collect"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_collect"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                tools:src="@mipmap/icon_collection_a" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="收藏"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_add_to_shop"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#f48506"
+            android:gravity="center"
+            android:text="加入购物车"
+            android:textColor="#ffff"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/buy_now"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#fb0404"
+            android:gravity="center"
+            android:text="立即购买"
+            android:textColor="#ffff"
+            android:textSize="15sp" />
+    </LinearLayout>
+</RelativeLayout>

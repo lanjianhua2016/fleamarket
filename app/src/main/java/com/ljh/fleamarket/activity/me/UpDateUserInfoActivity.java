@@ -36,6 +36,7 @@ import java.io.IOException;
 import okhttp3.Call;
 
 import static com.ljh.fleamarket.activity.R.id.up_user_id;
+import static com.ljh.fleamarket.activity.me.UserInfoActivty.userInfoActivty;
 
 public class UpDateUserInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -131,9 +132,13 @@ public class UpDateUserInfoActivity extends AppCompatActivity implements View.On
                 userBO= (UserBO) bundle.getSerializable("user");
                 if(userBO!=null){
                     //图片的操作
-                    byte [] headportrait = userBO.getUimage();
-                    Bitmap headportrait_bitmap = BitmapFactory.decodeByteArray(headportrait,0,headportrait.length,null);
-                    iv_portrait.setImageBitmap(headportrait_bitmap);
+                    if (userBO.getUimage() != null) {
+                        byte[] headportrait = userBO.getUimage();
+                        Bitmap headportrait_bitmap = BitmapFactory.decodeByteArray(headportrait, 0, headportrait.length, null);
+                        iv_portrait.setImageBitmap(headportrait_bitmap);
+                    } else {
+                        iv_portrait.setImageResource(R.drawable.heizi);
+                    }
                     et_Uname.setText(userBO.getUname());
                     et_Uid.setText(userBO.getUid());
                     String sex;
@@ -227,6 +232,10 @@ public class UpDateUserInfoActivity extends AppCompatActivity implements View.On
                                 Toast.makeText(UpDateUserInfoActivity.this, responseBO.message, Toast.LENGTH_SHORT).show();
                             }
                             pd.dismiss();//等待条消失
+                            userInfoActivty.finish();
+                            Intent baockToUserinfo = new Intent(UpDateUserInfoActivity.this, UserInfoActivty.class);
+                            startActivity(baockToUserinfo);
+                            finish();
                         }
                     });
                 }

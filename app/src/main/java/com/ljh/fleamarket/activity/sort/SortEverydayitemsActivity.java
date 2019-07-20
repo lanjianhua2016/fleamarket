@@ -26,6 +26,7 @@ import com.ljh.fleamarket.bo.Goods;
 import com.ljh.fleamarket.bo.ResponseBO;
 import com.ljh.fleamarket.bo.ResponseBuy;
 import com.ljh.fleamarket.bo.SearchBO;
+import com.ljh.fleamarket.utils.DataUtils;
 import com.ljh.fleamarket.utils.EncoderAndDecoderUtils;
 import com.ljh.fleamarket.utils.RequestUtils;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -55,18 +56,22 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
     private int pageNumber=1;
     private int pageSize = 5;
     private boolean refreshFlag;
+    private DataUtils dataApp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sort_everyday);
-
+        dataApp = (DataUtils) getApplication();
+        dataApp.setIntentPermission(false);
         backtosort3 = (Button)findViewById(R.id.backto_sort3);
         backtosort3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                setResult(RESULT_OK,intent);
-                finish();
+                if (dataApp.isIntentPermission()) {
+                    finish();
+                } else {
+                    Toast.makeText(SortEverydayitemsActivity.this, "请稍等...", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         setInit();
@@ -140,6 +145,7 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -161,7 +167,7 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            pd.dismiss();
+
                             if (responseBO.flag == 200) {
                                 //获取解析后生成goodslist
                                 resultGoodsList = responseBuy.getGoodsList();
@@ -180,6 +186,8 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
                             }else {
                                 Toast.makeText(SortEverydayitemsActivity.this, "刷新失败!", Toast.LENGTH_SHORT).show();
                             }
+                            pd.dismiss();
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }
@@ -219,6 +227,7 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -253,6 +262,7 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(SortEverydayitemsActivity.this, "刷新失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }
@@ -295,6 +305,7 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -334,6 +345,7 @@ public class SortEverydayitemsActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(SortEverydayitemsActivity.this, "加载失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }

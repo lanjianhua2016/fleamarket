@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ljh.fleamarket.activity.R;
+import com.ljh.fleamarket.activity.find.AddSaleActivity;
 import com.ljh.fleamarket.adapter.Dialogchoosephoto;
 import com.ljh.fleamarket.bo.ResponseBO;
 import com.ljh.fleamarket.bo.UserBO;
@@ -66,9 +67,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     //调用照相机返回图片文件
     private File tempFile;
-
     //图片Uri
     private Uri contentUri;
+    //图片文件名
+    private String fileName;
 
     private SharedPreferences sharedPreferences;
 
@@ -123,10 +125,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             //点击上传头像
             case R.id.headportrait:
                 //动态获取运行时权限，调用相机相册设置头像
-                if(ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(RegisterActivity.this,new String[]{ Manifest.permission.CAMERA },1);
-                }else{
-                    setHeadportrait();
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
+                    } else if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
+                    } else if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+                    } else {
+                        setHeadportrait();
+                    }
                 }
                 break;
         }
@@ -255,6 +263,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = new Intent(this, LoginActivity.class);
         intent.putExtra("userName", userName);
         startActivity(intent);
+        finish();
     }
 
     /**
@@ -266,33 +275,30 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void btnPickByTake() {
                 //用于保存调用相机拍照后所生成的文件
-
                 Log.i(TAG, "in register:点击选择调用相机");
-                tempFile = new File(Environment.getExternalStorageDirectory().getPath(), System.currentTimeMillis() + ".jpg");
-                //tempFile = new File(getExternalCacheDir(),"head_image.jpg");
-
-                //  /storage/emulated/0/1544353017346.jpg
-                //  /storage/emulated/0/1544353017346.jpg
-                //Log.i("8888","tempFile is :"+tempFile);
-
-
+                fileName = System.currentTimeMillis() + ".jpg";
+                tempFile = new File(RegisterActivity.this.getExternalCacheDir(), fileName);//存储在项目缓存目录下
+                try {
+                    tempFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //存储在手机内存根目录下
+//                tempFile = new File(Environment.getExternalStorageDirectory(), "/"+System.currentTimeMillis() + ".jpg");
+//                if (!tempFile.getParentFile().exists()){
+//                    tempFile.getParentFile().mkdirs();
+//                }
                 //判断版本
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   //如果在Android7.0以上,使用FileProvider获取Uri
-                    //intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                    contentUri = FileProvider.getUriForFile(RegisterActivity.this, "com.ljh.activity.fileprovider", tempFile);
-
-                    //Log.e("dasd", contentUri.toString());
-                    //intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
-                } else {    //否则使用Uri.fromFile(file)方法获取Uri
-                    //intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
+                    contentUri = FileProvider.getUriForFile(RegisterActivity.this, "com.ljh.activity.fileprovider ", tempFile);
+                } else {                                                  //否则使用Uri.fromFile(file)方法获取Uri
                     contentUri = Uri.fromFile(tempFile);
                 }
-
                 //跳转到调用系统相机
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 //Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
-                intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);  //保存图片
+//                intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
                 Log.i(TAG, "in register:准备进入相机回调方法");
                 startActivityForResult(intent, CAMERA_REQUEST_CODE);
             }
@@ -365,14 +371,45 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 //    }
 
 
+    /**
+     * 动态申请权限后的回调方法
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode){
             case 1:
-                if(grantResults.length>0&&grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    setHeadportrait();
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//成功申请相机权限，接下来申请读内存权限
+                    if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
+                    } else if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+                    } else {
+                        setHeadportrait();
+                    }
                 }else {
                     Toast.makeText(this, "You denied the CAMERA PERMISSION", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 2:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//成功申请读内存权限，接下来申请写内存权限
+                    if (ContextCompat.checkSelfPermission(RegisterActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+                    } else {
+                        setHeadportrait();
+                    }
+                } else {
+                    Toast.makeText(this, "You denied the READ_EXTERNAL_STORAGE PERMISSION", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 3:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//成功申请写内存权限，可以开始访问相机和相册
+                    setHeadportrait();
+                } else {
+                    Toast.makeText(this, "You denied the WRITE_EXTERNAL_STORAGE PERMISSION", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -392,11 +429,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         contentUri = FileProvider.getUriForFile(RegisterActivity.this, "com.ljh.activity.fileprovider", tempFile);
                         Log.i(TAG, "in register:调用相机后准备裁剪图片");
-                        cropPhoto(contentUri);//裁剪图片
+                        cropPhoto(tempFile, contentUri);//裁剪图片
                     } else {
                         contentUri = Uri.fromFile(tempFile);
                         Log.i(TAG, "in register:调用相机后准备裁剪图片");
-                        cropPhoto(contentUri);//裁剪图片
+                        cropPhoto(tempFile, contentUri);//裁剪图片
                     }
                 }
                 break;
@@ -404,9 +441,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case ALBUM_REQUEST_CODE:
                 Log.i(TAG, "in register:进入调用相册回调方法");
                 if (resultCode == RESULT_OK) {
-                    Uri uri = intent.getData();
+                    contentUri = intent.getData();
+                    fileName = System.currentTimeMillis() + ".jpg";//为图片生成一个新的文件名，并在剪切后将其保存在项目缓存目录下
+                    tempFile = new File(RegisterActivity.this.getExternalCacheDir(), fileName);
                     Log.i(TAG, "in register:调用相册后准备裁剪图片");
-                    cropPhoto(uri);//裁剪图片
+                    cropPhoto(tempFile, contentUri);//裁剪图片
                 }
                 break;
             //调用剪裁后返回
@@ -421,13 +460,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Log.i(TAG, "准备显示图片");
                     imageView.setImageBitmap(image);
 
-                    Log.i("saveImage","开始保存图片");
-
-                    //将图片保存到SD卡
-                    ImageUtil.saveImageInSd(image,Bitmap.CompressFormat.JPEG, 100,this);
-
-                    //image为拍照后生成的bitmap对象
-                    //下面开始将其转为byte数组
+                    //image为拍照后生成的bitmap对象下面开始将其转为byte数组
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                     byte [] userImage = baos.toByteArray();
@@ -441,12 +474,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("userHeader",userHeaderImage);
                     editor.apply();
-                    //也可以进行一些保存、压缩等操作后上传
-                    //ImageUtil.saveImage("userHeader", image);
-//                    File file = new File(path);
-                    /*
-                    *上传文件的操作
-                    */
 
                 }
                 break;
@@ -454,7 +481,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     /* 裁剪图片 */
-    private void cropPhoto(Uri uri) {
+    private void cropPhoto(File tempFile, Uri uri) {
         Log.i(TAG, "in register:开始裁剪图片");
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -466,6 +493,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         intent.putExtra("outputX", 300);
         intent.putExtra("outputY", 300);
         intent.putExtra("return-data", true);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));//将剪切后的图片保存在项目缓存目录下
         Log.i(TAG, "in register:准备进入裁剪图片回调方法");
         startActivityForResult(intent, CROP_REQUEST_CODE);
     }
@@ -504,137 +532,5 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-
-
-    /**
-     * 未封装的方法：保存图片到本地
-     */
-//    public String saveImage(String name, Bitmap bmp) {
-//        Log.i(TAG, "in register:开始保存图片");
-//        File appDir = new File(Environment.getExternalStorageDirectory().getPath());
-//        if (!appDir.exists()) {
-//            appDir.mkdir();
-//        }
-//        String fileName = name + ".jpg";
-//        File file = new File(appDir, fileName);
-//        try {
-//            FileOutputStream fos = new FileOutputStream(file);
-//            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-//            fos.flush();
-//            fos.close();
-//            return file.getAbsolutePath();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//
-//    }
-
-    /**
-     * 未封装的注册请求方法
-     */
-//    public void registerRequestWithOkHttp() {
-//        //等待动画
-//        final ProgressDialog pd = new ProgressDialog(this);
-//        pd.setMessage("正在注册...");
-//        pd.show();//显示等待
-////        try {
-//        Log.i(TAG, "进入发送注册请求方法。。。");
-//        userName = getUsername.getText().toString().trim();//从界面获取用户名
-//        passWord = getPassword.getText().toString().trim();//从界面获取密码
-//
-//        //String url = "http://192.168.0.187:8080/Proj20/register";
-//        //String url = "http://192.168.2.114:8080/Proj20/register";
-//        String url = "http://118.89.217.225:8080/Proj20/register";
-//
-//        UserBO userBO = new UserBO();//用户类，自己创建
-//        userBO.setOpType(90001);//设置操作类型，90001为类型码，其他类型码查看接口文档
-//        userBO.setUname(userName);//将获取的用户名传给对象
-//        userBO.setUpassword(passWord);//将获取的密码传给对象
-//
-//        Gson gson = new Gson();//创建Gson对象
-//        String jsonStr = gson.toJson(userBO, UserBO.class);//将对象转为字符串，发送请求时用到
-//        Log.i(TAG, "jsonStr" + jsonStr);
-//        Log.i(TAG, "准备发送注册请求。。。");
-//        //创建OkHttpClient实例对象
-//        OkHttpClient client = new OkHttpClient();
-//        RequestBody requestBody = new FormBody.Builder()//创建请求体
-//                .add("reqJson", jsonStr)//将由对象转来的字符串添加进请求体
-////                .add("username", uname)
-////                .add("password", upassword)
-//                .build();
-//
-//        Log.i(TAG, "发送注册请求。。。");
-//        Request request = new Request.Builder()//发送请求
-//                .url(url)
-//                .post(requestBody)
-//                .build();
-//
-////            Response response = client.newCall( request ).execute();//execute()方法是同步请求,需要try和catch
-////            String responseData = response.body().string();
-////            showResponse( responseData );
-////        }catch (Exception e){
-////            Log.i( TAG, "sendRequestWithOkHttp: "+e.toString() );
-////        }
-//
-//        client.newCall(request).enqueue(new Callback() {//enqueue方法是异步请求
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                Log.i(TAG, "获取数据失败!!" + e.toString());
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                if (response.isSuccessful()) {//回调的方法执行在子线程。
-//                    Log.i(TAG, "获取数据成功!!");
-//                    Log.i(TAG, "response.code()==" + response.code());
-//
-//                    final String responseStr = response.body().string();
-//                    Log.i(TAG, "response.body().string()==" + responseStr);
-//
-//                    Gson gson = new Gson();
-//                    final ResponseBO responseBO = gson.fromJson(responseStr, ResponseBO.class);//ResponseBO为自己定义的类，目的是将发送请求后返回的response字符串重新转为对象
-//                    Log.i(TAG, responseBO.toString());
-//
-//
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            pd.dismiss();
-//                            if (responseBO.flag == 200) {
-//                                Toast.makeText(RegisterActivity.this, "注册成功!!", Toast.LENGTH_SHORT).show();
-//                            } else {
-//                                Toast.makeText(RegisterActivity.this, "注册失败!!", Toast.LENGTH_SHORT).show();
-//                            }
-//                            returnLogin();//跳转到登录界面
-//                        }
-//                    });
-//                }
-//            }
-//        });
-//
-//    }
-    //        final ProgressDialog pd = new ProgressDialog(this);//初始化等待条
-//        pd.setMessage("正在注册...");//等待条信息
-//        pd.show();//显示等待条
-//
-//
-//        /**
-//         * 模拟后台
-//         */
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(2000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                pd.dismiss();//等待条消失
-//                //发送注册请求
-//                registerRequestWithOkHttp();
-//                returnLogin();//跳转到登录界面
-//            }
-//        }).start();
 
 }

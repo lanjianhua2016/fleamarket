@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         //记住密码
         Log.i(TAG, "开始判断是否存在记住密码");
-        sharedPreferences = getSharedPreferences("userInfo",MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("RememberUserInfo", MODE_PRIVATE);
         isremember = sharedPreferences.getBoolean("remember_password", false);
         if (isremember) {
             String username = sharedPreferences.getString("UserName", "");
@@ -91,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             getPassword.setText(password);
             rememberPass.setChecked(true);
         } else {
-            Log.i(TAG, "记住密码有误！");
+            Log.i(TAG, "没有记住密码！");
         }
 
         /**
@@ -113,8 +113,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             //跳转回我的界面
             case R.id.backto_me:
-                Intent int_back = new Intent();
-                setResult(RESULT_OK, int_back);
+                Intent int_back = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(int_back);
                 finish();
                 break;
 
@@ -174,7 +174,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             editor.clear();
         }
         editor.apply();
-
         //判断用户名、密码不能为空
         if (TextUtils.isEmpty(userName)) {
             Toast.makeText(LoginActivity.this, "用户名不能为空！", Toast.LENGTH_SHORT).show();
@@ -188,7 +187,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //设置对话框不能用“取消”按钮关闭
 //            pd.setCancelable(false);
             //设置对话框显示内容
-            pd.setMessage("正在登陆...");
+            pd.setMessage("正在登录...");
             //显示进度条对话框
             pd.show();
             //发送登录请求
@@ -204,7 +203,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (response.isSuccessful()) {
                         Log.i(TAG, "数据获取成功！！");
                         Log.i(TAG, "response.code==" + response.code());
-
                         String responseStr = response.body().string();
                         responseStr = EncoderAndDecoderUtils.deCoder(responseStr);
                         Log.i(TAG, "response.body().String()==" + responseStr);
@@ -213,50 +211,55 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         Log.i(TAG, responseBO.toString());
                         Log.i(TAG, "登录后返回的token为：" + responseBO.token);
                         Log.i(TAG, "登录后返回的uid为：" + responseBO.uid);
-                        byte [] userImg = responseBO.img;
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        if (userImg!=null){
-                            String userHeaderImage = new String(Base64.encode(userImg,Base64.DEFAULT));
-                            editor.putString("UserToken", responseBO.token);
-                            editor.putString("UserId", responseBO.uid);
-                            editor.putString("UserImg",userHeaderImage);
-                            editor.apply();
-                        }
-
+                        Log.i(TAG, "登录后返回的uname为：" + responseBO.uname);
                         if (responseBO.flag == 200) {
-
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Toast.makeText(LoginActivity.this, responseBO.message, Toast.LENGTH_SHORT).show();
                                 }
                             });
-
+                            byte[] userImg = responseBO.img;
+                            SharedPreferences sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            if (userImg != null) {
+                                String userHeaderImage = new String(Base64.encode(userImg, Base64.DEFAULT));
+                                editor.putString("UserImg", userHeaderImage);
+                            }
+                            editor.clear();
+                            editor.putString("UserToken", responseBO.token);
+                            editor.putString("UserId", responseBO.uid);
+                            editor.putString("UserName", responseBO.uname);
+                            editor.apply();
                             /**
                              * 跳转到主界面
                              */
-                            editor = sharedPreferences.edit();
-                            editor.putString("UserName", userName);
                             Intent loginIntent = new Intent(LoginActivity.this, MainActivity.class);
                             loginIntent.putExtra("loginInfo", "登录成功");
                             startActivity(loginIntent);
+                            finish();
+                            pd.dismiss();//等待条消失
 
                         } else {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     Toast.makeText(LoginActivity.this, responseBO.message, Toast.LENGTH_SHORT).show();
+                                    pd.dismiss();//等待条消失
                                 }
                             });
-
                         }
-                        pd.dismiss();//等待条消失
-
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+                                pd.dismiss();//等待条消失
+                            }
+                        });
                     }
                 }
             });
-
-
         }
     }
 

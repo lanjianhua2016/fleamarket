@@ -1,5 +1,6 @@
 package com.ljh.fleamarket.activity.me;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,11 +35,13 @@ public class UserInfoActivty extends AppCompatActivity {
     private RecyclerView userInfoView;
     private UserBO userBO;
 
+    public static Activity userInfoActivty;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info_activty);
-
+        userInfoActivty = this;
         initActivity();
     }
 
@@ -68,6 +71,7 @@ public class UserInfoActivty extends AppCompatActivity {
                 bundle.putSerializable("user",userBO);
                 toUpDateUserInfoIntent.putExtras(bundle);
                 startActivity(toUpDateUserInfoIntent);
+                //finish();
             }
         });
 

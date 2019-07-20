@@ -1,5 +1,6 @@
 package com.ljh.fleamarket.activity.find;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -29,6 +33,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.ljh.fleamarket.activity.R;
 import com.ljh.fleamarket.activity.me.MySaleActivity;
+import com.ljh.fleamarket.activity.me.RegisterActivity;
 import com.ljh.fleamarket.adapter.Dialogchoosephoto;
 import com.ljh.fleamarket.bo.Goods;
 import com.ljh.fleamarket.bo.ResponseBO;
@@ -80,6 +85,7 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
     private File tempFile;
     private String goodsPath;
     private String goodsImageName;
+    private String fileName;
     //图片Uri
     private Uri contentUri;
     //存储照片的字节数组
@@ -140,8 +146,8 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.backto_find1:
-                Intent intent = new Intent();
-                setResult(RESULT_OK,intent);
+//                Intent intent = new Intent();
+//                setResult(RESULT_OK,intent);
                 finish();
                 break;
             case R.id.submit_sell:
@@ -149,9 +155,19 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
                 submitGoods();
                 break;
             case R.id.goods_Image:
-                setGoodsImage();
+                //动态获取运行时权限，调用相机相册设置头像
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ContextCompat.checkSelfPermission(AddSaleActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddSaleActivity.this, new String[]{Manifest.permission.CAMERA}, 1);
+                    } else if (ContextCompat.checkSelfPermission(AddSaleActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddSaleActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
+                    } else if (ContextCompat.checkSelfPermission(AddSaleActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddSaleActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+                    } else {
+                        setGoodsImage();
+                    }
+                }
                 break;
-
         }
     }
 
@@ -271,25 +287,34 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
                 //用于保存调用相机拍照后所生成的文件
 
                 Log.i(TAG, "in sellActivity:点击选择调用相机");
-                goodsPath = Environment.getExternalStorageDirectory().getPath();
-                goodsImageName = System.currentTimeMillis() + ".jpg";
-                tempFile = new File(goodsPath,goodsImageName);
-                //tempFile = new File(getExternalCacheDir(),"head_image.jpg");
-
+//                goodsPath = Environment.getExternalStorageDirectory().getPath();
+//                goodsImageName = System.currentTimeMillis() + ".jpg";
+//                tempFile = new File(goodsPath,goodsImageName);
+                fileName = System.currentTimeMillis() + ".jpg";
+                tempFile = new File(AddSaleActivity.this.getExternalCacheDir(), fileName);//存储在项目缓存目录下
+                try {
+                    tempFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //存储在手机内存根目录下
+//                tempFile = new File(Environment.getExternalStorageDirectory(), "/"+System.currentTimeMillis() + ".jpg");
+//                if (!tempFile.getParentFile().exists()){
+//                    tempFile.getParentFile().mkdirs();
+//                }
                 //判断版本
-                if (Build.VERSION.SDK_INT >= 24) {   //如果在Android7.0以上,使用FileProvider获取Uri
-                    contentUri = FileProvider.getUriForFile(AddSaleActivity.this, "com.ljh.activity.fileprovider", tempFile);
-
-                } else {    //否则使用Uri.fromFile(file)方法获取Uri
-                    //intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {   //如果在Android7.0以上,使用FileProvider获取Uri
+                    contentUri = FileProvider.getUriForFile(AddSaleActivity.this, "com.ljh.activity.fileprovider ", tempFile);
+                } else {                                                  //否则使用Uri.fromFile(file)方法获取Uri
                     contentUri = Uri.fromFile(tempFile);
                 }
 
                 //跳转到调用系统相机
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 //Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
-                Log.i(TAG, "in sellActivity:准备进入相机回调方法");
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);  //保存图片
+//                intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
+                Log.i(TAG, "in register:准备进入相机回调方法");
                 startActivityForResult(intent, CAMERA_REQUEST_CODE);
             }
 
@@ -305,6 +330,52 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
         }.show();
     }
 
+    /**
+     * 动态申请权限后的回调方法
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//成功申请相机权限，接下来申请读内存权限
+                    if (ContextCompat.checkSelfPermission(AddSaleActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddSaleActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
+                    } else if (ContextCompat.checkSelfPermission(AddSaleActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddSaleActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+                    } else {
+                        setGoodsImage();
+                    }
+                } else {
+                    Toast.makeText(this, "You denied the CAMERA PERMISSION", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 2:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//成功申请读内存权限，接下来申请写内存权限
+                    if (ContextCompat.checkSelfPermission(AddSaleActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(AddSaleActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+                    } else {
+                        setGoodsImage();
+                    }
+                } else {
+                    Toast.makeText(this, "You denied the READ_EXTERNAL_STORAGE PERMISSION", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 3:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//成功申请写内存权限，可以开始访问相机和相册
+                    setGoodsImage();
+                } else {
+                    Toast.makeText(this, "You denied the WRITE_EXTERNAL_STORAGE PERMISSION", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
 
     /*回调接口*/
     @Override
@@ -312,27 +383,29 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
         switch (requestCode) {
             // 调用相机后返回
             case CAMERA_REQUEST_CODE:
-                Log.i(TAG, "in sellActivity:进入调用相机回调方法");
+                Log.i(TAG, "in register:进入调用相机回调方法");
                 if (resultCode == RESULT_OK) {
                     //用相机返回的照片去调用剪裁也需要对Uri进行处理
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         contentUri = FileProvider.getUriForFile(AddSaleActivity.this, "com.ljh.activity.fileprovider", tempFile);
-                        Log.i(TAG, "in sellActivity:调用相机后准备裁剪图片");
-                        cropPhoto(contentUri);//裁剪图片
+                        Log.i(TAG, "in register:调用相机后准备裁剪图片");
+                        cropPhoto(tempFile, contentUri);//裁剪图片
                     } else {
                         contentUri = Uri.fromFile(tempFile);
-                        Log.i(TAG, "in sellActivity:调用相机后准备裁剪图片");
-                        cropPhoto(contentUri);//裁剪图片
+                        Log.i(TAG, "in register:调用相机后准备裁剪图片");
+                        cropPhoto(tempFile, contentUri);//裁剪图片
                     }
                 }
                 break;
             //调用相册后返回
             case ALBUM_REQUEST_CODE:
-                Log.i(TAG, "in sellActivity:进入调用相册回调方法");
+                Log.i(TAG, "in register:进入调用相册回调方法");
                 if (resultCode == RESULT_OK) {
-                    Uri uri = intent.getData();
-                    Log.i(TAG, "in sellActivity:调用相册后准备裁剪图片");
-                    cropPhoto(uri);//裁剪图片
+                    contentUri = intent.getData();
+                    fileName = System.currentTimeMillis() + ".jpg";//为图片生成一个新的文件名，并在剪切后将其保存在项目缓存目录下
+                    tempFile = new File(AddSaleActivity.this.getExternalCacheDir(), fileName);
+                    Log.i(TAG, "in register:调用相册后准备裁剪图片");
+                    cropPhoto(tempFile, contentUri);//裁剪图片
                 }
                 break;
             //调用剪裁后返回
@@ -364,19 +437,13 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
                     image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                     imageByte = baos.toByteArray();
 
-                    //也可以进行一些保存、压缩等操作后上传
-                    String path = saveImage("GoodsImage", image);
-                    File file = new File(path);
-                    /*
-                    *上传文件的额操作
-                    */
                 }
                 break;
         }
     }
 
     /* 裁剪图片 */
-    private void cropPhoto(Uri uri) {
+    private void cropPhoto(File tempFile, Uri uri) {
         Log.i(TAG, "in sellActivity:开始裁剪图片");
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -388,29 +455,12 @@ public class AddSaleActivity extends AppCompatActivity implements View.OnClickLi
         intent.putExtra("outputX", 100);
         intent.putExtra("outputY", 100);
         intent.putExtra("return-data", true);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));//将剪切后的图片保存在项目缓存目录下
         Log.i(TAG, "in sellActivity:准备进入裁剪图片回调方法");
         startActivityForResult(intent, CROP_REQUEST_CODE);
     }
 
-    /* 保存图片到本地*/
-    public String saveImage(String name, Bitmap bmp) {
-        File appDir = new File(Environment.getExternalStorageDirectory().getPath());
-        if (!appDir.exists()) {
-            appDir.mkdir();
-        }
-        String fileName = name + ".jpg";
-        File file = new File(appDir, fileName);
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-            return file.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     /**
      * 检查网络连接状态

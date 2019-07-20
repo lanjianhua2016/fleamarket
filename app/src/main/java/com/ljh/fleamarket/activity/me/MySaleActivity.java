@@ -48,9 +48,8 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
     private List<Goods> resultGoodsList;
 
     private String userToken;
+    private String userId;
     private SharedPreferences sharedPreferences;
-
-    //private PullToRefreshAndPushToLoadView pullToRefreshAndPushToLoadView;
     private RecyclerView recyclerView;
     private ProgressDialog pd;
 
@@ -86,13 +85,6 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 RefreshGoods();
                 mRefreshLayout.finishRefresh(true);
-//                //List<String>  data = initDatas();
-//                resultGoodsList = RefreshGoods();
-////                Log.i("goods","goodslist.size():"+String.valueOf(resultGoodsList.size()));
-//                Message message = new Message();
-//                message.what = 1;
-//                message.obj = resultGoodsList;
-//                mHandler.sendMessageDelayed(message, 2000);
             }
         });
 
@@ -102,13 +94,6 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
                 LoadingMoreGoods();
                 mRefreshLayout.finishLoadMore(true);
-//                //List<String>  data = initDatas();
-//                resultGoodsList = LoadingMoreGoods();
-////                Log.i("goods","goodslist.size():"+String.valueOf(resultGoodsList.size()));
-//                Message message = new Message();
-//                message.what = 2;
-//                message.obj = resultGoodsList;
-//                mHandler.sendMessageDelayed(message, 2000);
             }
         });
 
@@ -122,8 +107,6 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //添加Android自带的分割线
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
-
-
     }
 
     /**
@@ -147,7 +130,7 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * 查询并展示商品信息
+     * 查询并展示商品信息,根据用户uid查询本用户所发布的摊位
      */
     private void DisplayGoods() {
         pd.setMessage("正在刷新...");
@@ -155,20 +138,21 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
 
         sharedPreferences = getSharedPreferences("userInfo", MODE_PRIVATE);
         userToken = sharedPreferences.getString("UserToken", "");
-
-        Log.i("goods", "查询得到的userToken:" + userToken);
-
+        userId = sharedPreferences.getString("UserId", "");
+        Log.i("salegoods", "查询得到的userToken:" + userToken);
+        Log.i("salegoods", "查询得到的userId:" + userId);
         //String url = "http://118.89.217.225:8080/Proj20/buy";
         //192.168.43.167:8080/FleaMarketProj/buy_refresh_goods?&reqJson={token: 6ef232aef0b547b7b527c9bcfbb6cbfc,pageNumber:4,pageSize:1,opType:90004}
 
         String url = "http://47.105.174.254:8080/FleaMarketProj/buy_refresh_goods";
         SearchBO searchBO = new SearchBO();
-        searchBO.setOpType(90004);
+        searchBO.setOpType(90005);//90005表示查询用户的摊位
         //searchBO.setToken(userToken);
 
         searchBO.setToken(userToken);
         searchBO.setPageNumber(1);
         searchBO.setPageSize(5);
+        searchBO.setUserId(userId);
 
         Gson gson = new Gson();
         String reqJson = gson.toJson(searchBO, SearchBO.class);
@@ -242,12 +226,13 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
 
         String url = "http://47.105.174.254:8080/FleaMarketProj/buy_refresh_goods";
         SearchBO searchBO = new SearchBO();
-        searchBO.setOpType(90004);
+        searchBO.setOpType(90005);//90005表示查询用户的摊位
         //searchBO.setToken(userToken);
 
         searchBO.setToken(userToken);
         searchBO.setPageNumber(1);
         searchBO.setPageSize(5);
+        searchBO.setUserId(userId);
 
         Gson gson = new Gson();
         String reqJson = gson.toJson(searchBO, SearchBO.class);
@@ -324,12 +309,13 @@ public class MySaleActivity extends AppCompatActivity implements View.OnClickLis
 
         String url = "http://47.105.174.254:8080/FleaMarketProj/buy_loadmore_goods";
         SearchBO searchBO = new SearchBO();
-        searchBO.setOpType(90004);
+        searchBO.setOpType(90005);//90005表示查询用户的摊位
         //searchBO.setToken(userToken);
 
         searchBO.setToken(userToken);
         searchBO.setPageNumber(pageNumber);
         searchBO.setPageSize(pageSize);
+        searchBO.setUserId(userId);
 
         Gson gson = new Gson();
         String reqJson = gson.toJson(searchBO, SearchBO.class);

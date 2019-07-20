@@ -61,13 +61,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="ID:"
+                    android:text="账号:"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/user_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:lines="1"
+                    android:ellipsize="end"
                     android:textSize="16sp" />
             </LinearLayout>
 

@@ -30,12 +30,14 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.ljh.fleamarket.activity.R;
+import com.ljh.fleamarket.activity.index.MainActivity;
 import com.ljh.fleamarket.activity.index.SearchActivity;
 import com.ljh.fleamarket.adapter.MyGoodsRecyclerAdapter;
 import com.ljh.fleamarket.bo.Goods;
 import com.ljh.fleamarket.bo.ResponseBO;
 import com.ljh.fleamarket.bo.ResponseBuy;
 import com.ljh.fleamarket.bo.SearchBO;
+import com.ljh.fleamarket.utils.DataUtils;
 import com.ljh.fleamarket.utils.RequestUtils;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -49,6 +51,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 import static android.content.Context.MODE_APPEND;
@@ -65,20 +68,20 @@ public class IndexFragment extends  Fragment {
     private int oldPosition = 0;
 
     private int[] imageIds = new int[]{
-            R.drawable.lunbo01,
-            R.drawable.lunbo02,
-            R.drawable.lunbo03,
-            R.drawable.lunbo01,
-            R.drawable.lunbo02,
+            R.drawable.banner1,
+            R.drawable.banner2,
+            R.drawable.banner3,
+            R.drawable.banner4,
+            R.drawable.banner5,
     };
 
-    private String[] titles = new String[]{
-            "壹",
-            "贰",
-            "叁",
-            "肆",
-            "伍"
-    };
+//    private String[] titles = new String[]{
+//            "壹",
+//            "贰",
+//            "叁",
+//            "肆",
+//            "伍"
+//    };
 
     private TextView title;
     private ViewPagerAdapter adapter;
@@ -95,11 +98,12 @@ public class IndexFragment extends  Fragment {
     private RecyclerView recyclerView;
 
     private int pageNumber=1;
-    private int pageSize = 7;
+    private int pageSize = 20;
     private boolean refreshFlag;
 
     private View netFailedView;
     private ProgressDialog pd;
+    private DataUtils appDate;
 
     // 只用来指定此fragment的布局
     @Nullable
@@ -116,13 +120,18 @@ public class IndexFragment extends  Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        appDate = (DataUtils) getActivity().getApplication();
+        appDate.setIntentPermission(false);
         Button searchbutton = (Button) getActivity().findViewById(R.id.search);
         searchbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), SearchActivity.class);
-                startActivity(intent);
+                if (appDate.isIntentPermission()) {
+                    Intent intent = new Intent(getActivity(), SearchActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getActivity(), "请稍等...", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -141,16 +150,25 @@ public class IndexFragment extends  Fragment {
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-                RefreshGoods();
-                mRefreshLayout.finishRefresh(true);
+                if (appDate.isIntentPermission()) {
+                    RefreshGoods();
+                } else {
+                    Toast.makeText(getActivity(), "请稍等...", Toast.LENGTH_SHORT).show();
+                    mRefreshLayout.finishRefresh(true);
+                }
+
             }
         });
 
         mRefreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
-                LoadingMoreGoods();
-                mRefreshLayout.finishLoadMore(true);
+                if (appDate.isIntentPermission()) {
+                    LoadingMoreGoods();
+                } else {
+                    Toast.makeText(getActivity(), "请稍等...", Toast.LENGTH_SHORT).show();
+                    mRefreshLayout.finishLoadMore(true);
+                }
             }
         });
 
@@ -176,8 +194,8 @@ public class IndexFragment extends  Fragment {
         dots.add(mView.findViewById(R.id.dot_3));
         dots.add(mView.findViewById(R.id.dot_4));
 
-        title = (TextView) mView.findViewById(R.id.title);
-        title.setText(titles[0]);
+//        title = (TextView) mView.findViewById(R.id.title);
+//        title.setText(titles[0]);
 
         adapter = new ViewPagerAdapter();
         mViewPaper.setAdapter(adapter);
@@ -185,7 +203,7 @@ public class IndexFragment extends  Fragment {
         mViewPaper.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                title.setText(titles[position]);
+//                title.setText(titles[position]);
                 dots.get(position).setBackgroundResource(R.drawable.dot_yes);
                 dots.get(oldPosition).setBackgroundResource(R.drawable.dot_no);
 
@@ -275,6 +293,7 @@ public class IndexFragment extends  Fragment {
         }
     }
 
+
     /**
      * 查询并展示商品信息
      */
@@ -311,11 +330,13 @@ public class IndexFragment extends  Fragment {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                appDate.setIntentPermission(true);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
+
                     Log.i("goods", "数据获取成功！！");
                     Log.i("goods", "response.code==" + response.code());
 
@@ -344,6 +365,7 @@ public class IndexFragment extends  Fragment {
                                     Toast.makeText(getActivity(), "刷新成功!", Toast.LENGTH_SHORT).show();
                                     pd.dismiss();
                                 }
+                                appDate.setIntentPermission(true);
                             }
                         });
                     }else if(responseBO.token==null){
@@ -352,6 +374,7 @@ public class IndexFragment extends  Fragment {
                             public void run() {
                                 Toast.makeText(getActivity(), "身份验证过期,请重新登录!", Toast.LENGTH_SHORT).show();
                                 pd.dismiss();
+                                appDate.setIntentPermission(true);
                             }
                         });
 
@@ -361,6 +384,7 @@ public class IndexFragment extends  Fragment {
                             public void run() {
                                 Toast.makeText(getActivity(), "刷新失败!", Toast.LENGTH_SHORT).show();
                                 pd.dismiss();
+                                appDate.setIntentPermission(true);
                             }
                         });
 
@@ -404,11 +428,13 @@ public class IndexFragment extends  Fragment {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                appDate.setIntentPermission(true);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
+
                     Log.i("goods", "数据获取成功！！");
                     Log.i("goods", "response.code==" + response.code());
 
@@ -426,7 +452,9 @@ public class IndexFragment extends  Fragment {
                             if (responseBO.flag == 200) {
                                 netFailedView.setVisibility(View.GONE);
                                 //获取解析后生成goodslist
-                                resultGoodsList.clear();//刷新前先清空之前的数据
+                                if (resultGoodsList != null) {
+                                    resultGoodsList.clear();//刷新前先清空之前的数据
+                                }
                                 List <Goods> refreshGoodsList = responseBuy.getGoodsList();
                                 if (refreshGoodsList.isEmpty()){
                                     Toast.makeText(getActivity(), "暂无数据!", Toast.LENGTH_SHORT).show();
@@ -440,6 +468,8 @@ public class IndexFragment extends  Fragment {
                             }else {
                                 Toast.makeText(getActivity(), "刷新失败!", Toast.LENGTH_SHORT).show();
                             }
+                            appDate.setIntentPermission(true);
+                            mRefreshLayout.finishRefresh(true);
                         }
                     });
                 }
@@ -483,11 +513,13 @@ public class IndexFragment extends  Fragment {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                appDate.setIntentPermission(true);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
+
                     Log.i("goods", "数据获取成功！！");
                     Log.i("goods", "response.code==" + response.code());
 
@@ -517,6 +549,8 @@ public class IndexFragment extends  Fragment {
                             }else {
                                 Toast.makeText(getActivity(), "加载失败!!", Toast.LENGTH_SHORT).show();
                             }
+                            appDate.setIntentPermission(true);
+                            mRefreshLayout.finishLoadMore(true);
                         }
                     });
                 }
@@ -559,6 +593,8 @@ public class IndexFragment extends  Fragment {
             });
         }
     }
+
+
 }
 
 

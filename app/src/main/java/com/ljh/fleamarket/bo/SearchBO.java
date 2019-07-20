@@ -1,9 +1,5 @@
 package com.ljh.fleamarket.bo;
 
-/**
- * Created by ASUS on 2019/3/29.
- */
-
 public class SearchBO {
     private int opType;     //操作类型（发布，维护等）
     private String token;    //token
@@ -12,6 +8,15 @@ public class SearchBO {
     private String goodsType;
     private String getMoreFlag;
     private String goodsKeyWord;
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public int getOpType() {
         return opType;

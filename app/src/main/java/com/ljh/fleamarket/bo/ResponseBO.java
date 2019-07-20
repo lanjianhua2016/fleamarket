@@ -8,6 +8,7 @@ public class ResponseBO {
     public String token;
     public String uid;
     public byte [] img;
+    public String uname;
     private UserBO userBO;
 
     public int getFlag() {
@@ -50,11 +51,32 @@ public class ResponseBO {
         this.img = img;
     }
 
+    public String getUname() {
+        return uname;
+    }
+
+    public void setUname(String uname) {
+        this.uname = uname;
+    }
+
     public UserBO getUserBO() {
         return userBO;
     }
 
     public void setUserBO(UserBO userBO) {
         this.userBO = userBO;
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseBO{" +
+                "flag=" + flag +
+                ", message='" + message + '\'' +
+                ", token='" + token + '\'' +
+                ", uid='" + uid + '\'' +
+                ", img=" + Arrays.toString(img) +
+                ", uname='" + uname + '\'' +
+                ", userBO=" + userBO +
+                '}';
     }
 }

@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginLeft="10dp"
-                android:gravity="center"
+                android:gravity="left"
                 android:hint="商品名称" />
         </LinearLayout>
 
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginLeft="10dp"
-                android:gravity="center"
+                android:gravity="left"
                 android:hint="商品数量" />
         </LinearLayout>
 
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginLeft="10dp"
-                android:gravity="center"
+                android:gravity="left"
                 android:hint="商品类型" />
         </LinearLayout>
 
@@ -87,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_marginLeft="10dp"
-                android:gravity="center"
+                android:gravity="left"
                 android:hint="联系方式" />
         </LinearLayout>
 

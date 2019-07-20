@@ -2,9 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF4F0F0"
     android:orientation="vertical">
-
+    <!--android:background="#FFF4F0F0"-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -29,7 +28,12 @@
 
     </FrameLayout>
 
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:text="此版本不为用户提供任何的交易功能，仅为商品提供发布和用户求购展示平台，不收取用户任何费用，请放心使用！后续版本升级将提供更多丰富内容，敬请期待！感谢您的使用与信任。" />
 
 
 </LinearLayout>

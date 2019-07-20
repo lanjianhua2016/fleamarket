@@ -31,6 +31,7 @@ import com.ljh.fleamarket.bo.Goods;
 import com.ljh.fleamarket.bo.ResponseBO;
 import com.ljh.fleamarket.bo.ResponseBuy;
 import com.ljh.fleamarket.bo.SearchBO;
+import com.ljh.fleamarket.utils.DataUtils;
 import com.ljh.fleamarket.utils.RequestUtils;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -59,8 +60,9 @@ public class SaleFragment extends Fragment {
     private RecyclerView recyclerView;
 
     private int pageNumber = 1;
-    private int pageSize = 7;
+    private int pageSize = 20;
     private boolean refreshFlag;
+    private DataUtils dataApp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,6 +74,8 @@ public class SaleFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        dataApp = (DataUtils) getActivity().getApplication();
+        dataApp.setIntentPermission(false);
         DisplayGoods();
         mRefreshLayout = getActivity().findViewById(R.id.smartrefresh_layout_sale);
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -179,6 +183,7 @@ public class SaleFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -210,6 +215,7 @@ public class SaleFragment extends Fragment {
                                     //视图加载适配器
                                     recyclerView.setAdapter(recyclerAdapter);//设置Adapter(适配器)
                                     Toast.makeText(getActivity(), "刷新成功!", Toast.LENGTH_SHORT).show();
+                                    dataApp.setIntentPermission(true);
                                 }
                             }
                         });
@@ -219,6 +225,7 @@ public class SaleFragment extends Fragment {
                             public void run() {
                                 pd.dismiss();
                                 Toast.makeText(getActivity(), "身份验证过期,请重新登录!", Toast.LENGTH_SHORT).show();
+                                dataApp.setIntentPermission(true);
                             }
                         });
                     } else {
@@ -227,6 +234,7 @@ public class SaleFragment extends Fragment {
                             public void run() {
                                 pd.dismiss();
                                 Toast.makeText(getActivity(), "刷新失败!", Toast.LENGTH_SHORT).show();
+                                dataApp.setIntentPermission(true);
                             }
                         });
                     }
@@ -270,10 +278,12 @@ public class SaleFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+
                 if (response.isSuccessful()) {
                     Log.i("goods", "数据获取成功！！");
                     Log.i("goods", "response.code==" + response.code());
@@ -306,6 +316,7 @@ public class SaleFragment extends Fragment {
                             } else {
                                 Toast.makeText(getActivity(), "刷新失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }
@@ -349,10 +360,12 @@ public class SaleFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+
                 if (response.isSuccessful()) {
                     Log.i("goods", "数据获取成功！！");
                     Log.i("goods", "response.code==" + response.code());
@@ -384,6 +397,7 @@ public class SaleFragment extends Fragment {
                             } else {
                                 Toast.makeText(getActivity(), "加载失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }

@@ -17,10 +17,19 @@ public class Goods implements Serializable {
     private String userid;       //发布人ID
     private String contact;      //联系方式
     private String description; //商品描述
-    private String goodsTypeName; //所属类名（可选字段）
+    private String goodsTypeName; //所属类名（可选字段
+    private int goodsID;          //商品编号
 
     private String token;    //token
     private int opType;     //操作类型（发布，维护等）
+
+    public int getGoodsID() {
+        return goodsID;
+    }
+
+    public void setGoodsID(int goodsID) {
+        this.goodsID = goodsID;
+    }
 
     public String getGoodsType() {
         return goodsType;
@@ -121,7 +130,7 @@ public class Goods implements Serializable {
     @Override
     public String toString() {
         return "Goods{" +
-                ", goodsImg=" + Arrays.toString(goodsImg) +
+                "goodsImg=" + Arrays.toString(goodsImg) +
                 ", goodsName='" + goodsName + '\'' +
                 ", price=" + price +
                 ", unit='" + unit + '\'' +
@@ -131,6 +140,7 @@ public class Goods implements Serializable {
                 ", contact='" + contact + '\'' +
                 ", description='" + description + '\'' +
                 ", goodsTypeName='" + goodsTypeName + '\'' +
+                ", goodsID=" + goodsID +
                 ", token='" + token + '\'' +
                 ", opType=" + opType +
                 '}';

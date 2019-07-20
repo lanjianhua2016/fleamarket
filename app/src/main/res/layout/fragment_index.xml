@@ -36,22 +36,21 @@
         <android.support.v4.view.ViewPager
             android:id="@+id/vp"
             android:layout_width="match_parent"
-            android:layout_height="200dp"/>
+            android:layout_height="180dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="30dp"
             android:layout_gravity="bottom"
             android:background="#33000000"
             android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="图片标题"
-                android:textColor="@android:color/white"/>
+            <!--<TextView-->
+            <!--android:id="@+id/title"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textColor="@android:color/white"/>-->
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -103,28 +102,36 @@
         </LinearLayout>
     </FrameLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
+        android:padding="5dp"
+        android:orientation="horizontal"
         android:background="#ffffff">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:text="今日推荐"
-            android:gravity="right|center"
-            android:textColor="#f6ba04"
-            android:textSize="20dp"/>
 
+        <View
+            android:layout_width="100dp"
+            android:layout_weight="1"
+            android:background="#000000"
+            android:layout_gravity="center_vertical"
+            android:layout_height="1px" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            android:layout_gravity="right|center"
-            android:text="更多"
-            android:textSize="20dp"
-            android:textColor="#f10404"/>
-    </FrameLayout>
+            android:text="今日推荐"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:textColor="#f60c04"
+            android:textSize="15sp" />
+
+        <View
+            android:layout_width="100dp"
+            android:layout_weight="1"
+            android:background="#000000"
+            android:layout_gravity="center_vertical"
+            android:layout_height="1px" />
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/net_failed_layout"

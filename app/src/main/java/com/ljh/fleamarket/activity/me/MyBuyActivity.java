@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.ljh.fleamarket.activity.R;
 import com.ljh.fleamarket.activity.find.AddBuyActivity;
+import com.ljh.fleamarket.adapter.GoodsBuyAdapter;
 import com.ljh.fleamarket.adapter.MyGoodsRecyclerAdapter;
 import com.ljh.fleamarket.bo.Goods;
 import com.ljh.fleamarket.bo.ResponseBO;
@@ -43,7 +44,7 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
     private Button backToMe;
 
     private RefreshLayout mRefreshLayout;
-    private MyGoodsRecyclerAdapter recyclerAdapter;
+    private GoodsBuyAdapter recyclerAdapter;
     private List<Goods> resultGoodsList;
 
     private String userToken;
@@ -55,6 +56,7 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
     private int pageNumber=1;
     private int pageSize = 5;
     private boolean refreshFlag;
+    private String userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,13 +76,6 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 RefreshGoods();
                 mRefreshLayout.finishRefresh(true);
-//                //List<String>  data = initDatas();
-//                resultGoodsList = RefreshGoods();
-////                Log.i("goods","goodslist.size():"+String.valueOf(resultGoodsList.size()));
-//                Message message = new Message();
-//                message.what = 1;
-//                message.obj = resultGoodsList;
-//                mHandler.sendMessageDelayed(message, 2000);
             }
         });
 
@@ -90,13 +85,6 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
                 LoadingMoreGoods();
                 mRefreshLayout.finishLoadMore(true);
-//                //List<String>  data = initDatas();
-//                resultGoodsList = LoadingMoreGoods();
-////                Log.i("goods","goodslist.size():"+String.valueOf(resultGoodsList.size()));
-//                Message message = new Message();
-//                message.what = 2;
-//                message.obj = resultGoodsList;
-//                mHandler.sendMessageDelayed(message, 2000);
             }
         });
 
@@ -131,7 +119,7 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
     }
 
     /**
-     * 查询并展示商品信息
+     * 查询并展示商品信息，根据用户uid查询用户所发布的求购信息，参数：uid，
      */
     private void DisplayGoods() {
 
@@ -140,20 +128,22 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
 
         sharedPreferences = getSharedPreferences("userInfo", Context.MODE_NO_LOCALIZED_COLLATORS | MODE_ENABLE_WRITE_AHEAD_LOGGING | MODE_APPEND);
         userToken = sharedPreferences.getString("UserToken", "");
+        userId = sharedPreferences.getString("UserId", "");
 
         Log.i("goods", "查询得到的userToken:" + userToken);
 
         //String url = "http://118.89.217.225:8080/Proj20/buy";
         //192.168.43.167:8080/FleaMarketProj/buy_refresh_goods?&reqJson={token: 6ef232aef0b547b7b527c9bcfbb6cbfc,pageNumber:4,pageSize:1,opType:90004}
 
-        String url = "http://47.105.174.254:8080/FleaMarketProj/buy_refresh_goods";
+        String url = "http://47.105.174.254:8080/FleaMarketProj/buy_goods";
         SearchBO searchBO = new SearchBO();
-        searchBO.setOpType(90004);
+        searchBO.setOpType(80003);//80003表示查询特定用户的求购信息
         //searchBO.setToken(userToken);
 
         searchBO.setToken(userToken);
         searchBO.setPageNumber(1);
         searchBO.setPageSize(5);
+        searchBO.setUserId(userId);
 
         Gson gson = new Gson();
         String reqJson = gson.toJson(searchBO, SearchBO.class);
@@ -193,7 +183,7 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
                                     Toast.makeText(MyBuyActivity.this, "暂无数据!", Toast.LENGTH_SHORT).show();
                                 }else {
                                     //创建适配器
-                                    recyclerAdapter = new MyGoodsRecyclerAdapter(MyBuyActivity.this, resultGoodsList);
+                                    recyclerAdapter = new GoodsBuyAdapter(MyBuyActivity.this, resultGoodsList);
                                     //视图加载适配器
                                     recyclerView.setAdapter(recyclerAdapter);//设置Adapter(适配器)
                                     Toast.makeText(MyBuyActivity.this, "刷新成功!", Toast.LENGTH_SHORT).show();
@@ -224,14 +214,15 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
         //String url = "http://118.89.217.225:8080/Proj20/buy";
         //192.168.43.167:8080/FleaMarketProj/buy_refresh_goods?&reqJson={token: 6ef232aef0b547b7b527c9bcfbb6cbfc,pageNumber:4,pageSize:1,opType:90004}
 
-        String url = "http://47.105.174.254:8080/FleaMarketProj/buy_refresh_goods";
+        String url = "http://47.105.174.254:8080/FleaMarketProj/buy_goods";
         SearchBO searchBO = new SearchBO();
-        searchBO.setOpType(90004);
+        searchBO.setOpType(80003);//80003表示查询特定用户的求购信息
         //searchBO.setToken(userToken);
 
         searchBO.setToken(userToken);
         searchBO.setPageNumber(1);
         searchBO.setPageSize(5);
+        searchBO.setUserId(userId);
 
         Gson gson = new Gson();
         String reqJson = gson.toJson(searchBO, SearchBO.class);
@@ -272,12 +263,16 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
 //                                recyclerAdapter.notifyDataSetChanged();
 
                                 resultGoodsList = responseBuy.getGoodsList();
-                                //创建适配器
-                                recyclerAdapter = new MyGoodsRecyclerAdapter(MyBuyActivity.this, resultGoodsList);
-                                //视图加载适配器
-                                recyclerView.setAdapter(recyclerAdapter);//设置Adapter(适配器)
-                                Toast.makeText(MyBuyActivity.this, "刷新成功!", Toast.LENGTH_SHORT).show();
-                                //pullToRefreshAndPushToLoadView.finishLoading();
+                                if (resultGoodsList.isEmpty()) {
+                                    Toast.makeText(MyBuyActivity.this, "暂无数据!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    //创建适配器
+                                    recyclerAdapter = new GoodsBuyAdapter(MyBuyActivity.this, resultGoodsList);
+                                    //视图加载适配器
+                                    recyclerView.setAdapter(recyclerAdapter);//设置Adapter(适配器)
+                                    Toast.makeText(MyBuyActivity.this, "刷新成功!", Toast.LENGTH_SHORT).show();
+                                    //pullToRefreshAndPushToLoadView.finishLoading();
+                                }
                             }else if(responseBO.token==null){
                                 Toast.makeText(MyBuyActivity.this, "身份验证过期,请重新登录!", Toast.LENGTH_SHORT).show();
                             } else {
@@ -306,14 +301,15 @@ public class MyBuyActivity extends AppCompatActivity implements View.OnClickList
         //String url = "http://118.89.217.225:8080/Proj20/buy";
         //192.168.43.167:8080/FleaMarketProj/buy_refresh_goods?&reqJson={token: 6ef232aef0b547b7b527c9bcfbb6cbfc,pageNumber:4,pageSize:1,opType:90004}
 
-        String url = "http://47.105.174.254:8080/FleaMarketProj/buy_loadmore_goods";
+        String url = "http://47.105.174.254:8080/FleaMarketProj/buy_goods";
         SearchBO searchBO = new SearchBO();
-        searchBO.setOpType(90004);
+        searchBO.setOpType(80004);//80004表示加载特定用户的求购信息
         //searchBO.setToken(userToken);
 
         searchBO.setToken(userToken);
         searchBO.setPageNumber(pageNumber);
         searchBO.setPageSize(pageSize);
+        searchBO.setUserId(userId);
 
         Gson gson = new Gson();
         String reqJson = gson.toJson(searchBO, SearchBO.class);

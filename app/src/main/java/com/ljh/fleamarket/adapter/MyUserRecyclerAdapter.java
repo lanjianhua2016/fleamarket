@@ -54,10 +54,14 @@ public class MyUserRecyclerAdapter extends RecyclerView.Adapter <MyUserRecyclerA
         holder.userWeixin.setText(user.getWeixin());
         holder.userPhone.setText(user.getUphone());
 
-        //图片的操作
-        byte [] headportrait = userBO.getUimage();
-        Bitmap headportrait_bitmap = BitmapFactory.decodeByteArray(headportrait,0,headportrait.length,null);
-        holder.userHeadportrait.setImageBitmap(headportrait_bitmap);
+        if (userBO.getUimage() != null) {
+            //图片的操作
+            byte[] headportrait = userBO.getUimage();
+            Bitmap headportrait_bitmap = BitmapFactory.decodeByteArray(headportrait, 0, headportrait.length, null);
+            holder.userHeadportrait.setImageBitmap(headportrait_bitmap);
+        } else {
+            holder.userHeadportrait.setImageResource(R.drawable.heizi);
+        }
     }
 
     @Override

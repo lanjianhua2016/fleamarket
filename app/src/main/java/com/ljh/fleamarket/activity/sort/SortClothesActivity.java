@@ -26,6 +26,7 @@ import com.ljh.fleamarket.bo.Goods;
 import com.ljh.fleamarket.bo.ResponseBO;
 import com.ljh.fleamarket.bo.ResponseBuy;
 import com.ljh.fleamarket.bo.SearchBO;
+import com.ljh.fleamarket.utils.DataUtils;
 import com.ljh.fleamarket.utils.EncoderAndDecoderUtils;
 import com.ljh.fleamarket.utils.RequestUtils;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
@@ -55,18 +56,24 @@ public class SortClothesActivity extends AppCompatActivity {
     private int pageNumber=1;
     private int pageSize = 5;
     private boolean refreshFlag;
+    private DataUtils dataApp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sort_clothes);
 
+        dataApp = (DataUtils) getApplication();
+        dataApp.setIntentPermission(false);
         backtosort5 = (Button)findViewById(R.id.backto_sort5);
         backtosort5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                setResult(RESULT_OK,intent);
-                finish();
+                if (dataApp.isIntentPermission()) {
+                    finish();
+                } else {
+                    Toast.makeText(SortClothesActivity.this, "请稍等...", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -141,6 +148,7 @@ public class SortClothesActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -181,6 +189,7 @@ public class SortClothesActivity extends AppCompatActivity {
                             }else {
                                 Toast.makeText(SortClothesActivity.this, "刷新失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }
@@ -220,6 +229,7 @@ public class SortClothesActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -254,6 +264,7 @@ public class SortClothesActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(SortClothesActivity.this, "刷新失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }
@@ -296,6 +307,7 @@ public class SortClothesActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 Log.i("goods", "数据获取失败！！" + e.toString());
                 ConnetctFailed();
+                dataApp.setIntentPermission(true);
             }
 
             @Override
@@ -335,6 +347,7 @@ public class SortClothesActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(SortClothesActivity.this, "加载失败!", Toast.LENGTH_SHORT).show();
                             }
+                            dataApp.setIntentPermission(true);
                         }
                     });
                 }

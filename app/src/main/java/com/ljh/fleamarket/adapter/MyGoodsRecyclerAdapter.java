@@ -67,18 +67,8 @@ public class MyGoodsRecyclerAdapter extends RecyclerView.Adapter <MyGoodsRecycle
             public void onClick(View v) {
                 int position = holder.getAdapterPosition();
                 Goods goods = goodsList.get(position);
-//                Toast.makeText(v.getContext(), "you clicked :" + goods.getGoodsName(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(v.getContext(),GoodsInfoActivity.class);
                 Bundle bundle = new Bundle();
-//                bundle.putByteArray("goodsImage",goods.getGoodsImg());
-//                bundle.putString("goodsName",goods.getGoodsName());
-//                bundle.putFloat("goodsPrice",goods.getPrice());
-//                bundle.putFloat("goodsQuantity",goods.getQuality());
-//                bundle.putString("goodsUnit",goods.getUnit());
-//                bundle.putString("goodsType",goods.getGoodsType());
-//                bundle.putString("userId",goods.getUserid());
-//                bundle.putString("Contact",goods.getContact());
-//                bundle.putString("Description",goods.getDescription());
                 bundle.putSerializable("goods",goods);
                 intent.putExtras(bundle);
                 v.getContext().startActivity(intent);
